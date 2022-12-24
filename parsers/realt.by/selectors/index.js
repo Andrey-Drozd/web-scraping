@@ -7,6 +7,9 @@ export const AD_ID = '.listing-item .flex-grow-1'
 // стоимость в мес
 export const AD_PRICE = 'div.row.no-gutters.align-items-center.color-dark > div'
 
+// заголовок
+export const AD_TITLE = 'div.desc > a'
+
 // общая площадь
 export const AD_SQUARE = 'div.info-large > span:nth-child(1)'
 
