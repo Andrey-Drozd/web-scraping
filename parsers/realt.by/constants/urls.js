@@ -1,7 +1,5 @@
 const START_PAGE = 0
 
-const START_URL = `
-https://realt.by/rent/flat-for-long/?search=
-eJx9jTEOgCAQBF8DNRSUNoZ%2FXBBPQwPk7jD6e5HYajm7s1mWQngpN2%2BonJ94IOsTYmlZoKYojZC7sA%2FBamCUVnvAhQSWvvUdzFOuQRAIj8Sp5A%2FR%2FoiEESoS1PCemRtbkDbf&view=1`
+const START_URL = `https://realt.by/rent/flat-for-long/?search=eJx9jTsOgDAMQ09D53boyIK4RwQloEqIRkmK4PaUj9hg9POTLZoY98o3I1a%2BreWKYohjKKCZLuqtfcl8E%2B%2FMBiHlRYFi0Mwor%2B4MCGqmAiSxQl%2F22xLsWQ6dIjCuUWJaPkT3IzIGIGSg7jmzB7PIQQw%3D&view=1`
 
 export const START_PREPARED_URL = `${START_URL}&page=${START_PAGE}`
