@@ -1,62 +1,55 @@
 import { init } from '../init.js'
 import { curryEvaluate } from './utils/index.js'
 
-import { START_URL, INNER_TEXT } from './constants/index.js'
 import {
-  ITEM,
-  ITEM_FLOOR,
-  ITEM_ID,
-  ITEM_PRICE,
-  ITEM_ROOMS,
-  ITEM_SQUARE,
-  NUMBER_OF_ITEMS,
+  AD,
+  AD_FLOOR,
+  AD_ID,
+  AD_PRICE,
+  AD_ROOMS,
+  AD_SQUARE,
+  COUNT_OF_ALL_ADS,
   PAGINATION,
 } from './selectors/index.js'
 
+import { START_PREPARED_URL } from './constants/index.js'
+
 async function parser(URL) {
-  let PAGE_NUMBER = 0
-  const PREPARED_URL = `${URL}&page=${PAGE_NUMBER}`
+  const { browser, page } = await init(URL, { headless: true })
 
-  const { browser, page } = await init(PREPARED_URL, { headless: true })
+  const countAllAdsNode = await page.$(COUNT_OF_ALL_ADS)
+  const countAllAds = await page.evaluate((number) => {
+    return number?.innerText
+  }, countAllAdsNode)
+  console.log('countAllAds: ', countAllAds) // 465
 
-  const itemsCount = await page.$(NUMBER_OF_ITEMS)
+  // 1 - блок получения данных с одной страницы
+  const ads = []
+  const adsNode = await page.$$(AD)
 
-  const itemsCountTest = await page.evaluate((el) => {
-    return el?.innerText
-  }, itemsCount)
+  for (const adNode of adsNode) {
+    const evaluate = curryEvaluate(page, adNode)
 
-  console.log('itemsCountTest: ', itemsCountTest) // 465
-
-  const products = await page.$$(ITEM)
-
-  console.log('products.length: ', products.length) // 60 ElementHandle
-
-  const items = []
-
-  for (const product of products) {
-    const evaluate = curryEvaluate(page, product)
-
-    const id = await evaluate({ selector: ITEM_ID, property: INNER_TEXT })
-    const price = await evaluate({ selector: ITEM_PRICE, property: INNER_TEXT })
-    const square = await evaluate({ selector: ITEM_SQUARE, property: INNER_TEXT })
-    const rooms = await evaluate({ selector: ITEM_ROOMS, property: INNER_TEXT })
-    const floor = await evaluate({ selector: ITEM_FLOOR, property: INNER_TEXT })
+    const id = await evaluate(AD_ID)
+    const price = await evaluate(AD_PRICE)
+    const square = await evaluate(AD_SQUARE)
+    const rooms = await evaluate(AD_ROOMS)
+    const floor = await evaluate(AD_FLOOR)
 
     // фильтр для некорректных объявлений
-    id && items.push({ id, price, square, rooms, floor })
+    id && ads.push({ id, price, square, rooms, floor })
   }
+  // 1 - блок получения данных с одной страницы
 
-  const pages = await page.$$(PAGINATION)
-  console.log('pages: ', pages)
+  const pagesNode = await page.$$(PAGINATION)
+  console.log('pages: ', pagesNode)
 
-  console.log('items.lengt: ', items.length) // 50 или 10
+  console.log('страниц всего: ', Math.ceil(countAllAds / ads.length))
+  console.log('страниц всего для парсинга: ', Math.ceil(countAllAds / ads.length) - 1)
 
-  console.log('страниц всего: ', Math.ceil(itemsCountTest / items.length))
-  console.log('страниц всего для парсинга: ', Math.ceil(itemsCountTest / items.length) - 1)
-
-  items.forEach((item) => console.log(item))
+  ads.forEach((ad) => console.log(ad))
 
   await browser.close()
 }
 
-parser(START_URL).then(() => console.log('PARSING DONE'))
+parser(START_PREPARED_URL).then(() => console.log('PARSING DONE'))

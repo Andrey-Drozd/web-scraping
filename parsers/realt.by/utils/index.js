@@ -1,11 +1,14 @@
-export const curryEvaluate = (page, product) => {
-  return async (options) => {
+import { INNER_TEXT } from '../constants/index.js'
+
+export const curryEvaluate = (page, adNode) => {
+  return async (selector, property = INNER_TEXT) => {
     const result = await page.evaluate(
-      (product, { selector, property }) => {
-        return product.querySelector(selector)?.[property]
+      (adNode, selector, property) => {
+        return adNode.querySelector(selector)?.[property]
       },
-      product,
-      { ...options }
+      adNode,
+      selector,
+      property
     )
 
     return result
