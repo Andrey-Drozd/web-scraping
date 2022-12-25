@@ -1,15 +1,17 @@
 import puppeteer from 'puppeteer'
 
-async function init(url, options) {
+import { NETWORK_IDLE_2 } from './realt.by/constants'
+
+async function init(url: string, options: { headless: boolean }) {
   const browser = await puppeteer.launch({ headless: options.headless })
   const page = await browser.newPage()
 
   await page.setViewport({
-    width: 1200,
-    height: 1200,
+    width: 1920,
+    height: 1080,
   })
 
-  await page.goto(url, { waitUntil: 'load' })
+  await page.goto(url, { waitUntil: NETWORK_IDLE_2 })
 
   return { browser, page }
 }

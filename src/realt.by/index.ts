@@ -1,5 +1,5 @@
-import { init } from '../init.js'
-import { curryEvaluate } from './utils/index.js'
+import { init } from '../init'
+import { curryEvaluate } from './utils'
 
 import {
   AD,
@@ -10,11 +10,11 @@ import {
   AD_SQUARE,
   AD_TITLE,
   COUNT_OF_ALL_ADS,
-} from './selectors/index.js'
+} from './selectors'
 
-import { HREF, START_PREPARED_URL, START_URL } from './constants/index.js'
+import { HREF, START_PREPARED_URL, START_URL } from './constants'
 
-async function parser(URL) {
+async function parser(URL: string) {
   const { browser, page } = await init(URL, { headless: true })
 
   // количество объявлений по выбранным фильтрам
