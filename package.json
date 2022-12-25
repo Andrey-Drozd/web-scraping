@@ -1,18 +1,22 @@
 {
-  "name": "puppeteer",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
   "license": "ISC",
+  "author": "DROZD ANDREY",
+  "name": "puppeteer",
+  "description": "parser-puppeteer",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npm run build && node dst/realt.by/index.js",
+    "build": "npm run ts-check && npm run clean-build && npm run ts-build",
+    "ts-build": "tsc -p tsconfig-build.json",
+    "ts-check": "tsc -p tsconfig-check.json",
+    "clean-build": "rimraf ./dst"
+  },
   "dependencies": {
     "puppeteer": "^19.4.1"
   },
   "devDependencies": {
-    "prettier": "2.8.1"
+    "prettier": "2.8.1",
+    "rimraf": "^3.0.2"
   },
-  "type": "module"
+  "type": "commonjs"
 }
