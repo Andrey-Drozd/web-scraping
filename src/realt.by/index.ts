@@ -1,6 +1,5 @@
 import { init } from '../init'
-import { curryEvaluate } from './utils'
-
+import { HREF, START_PREPARED_URL, START_URL } from './constants'
 import {
   AD,
   AD_FLOOR,
@@ -9,10 +8,9 @@ import {
   AD_ROOMS,
   AD_SQUARE,
   AD_TITLE,
-  COUNT_OF_ALL_ADS,
+  COUNT_OF_ALL_ADS
 } from './selectors'
-
-import { HREF, START_PREPARED_URL, START_URL } from './constants'
+import { curryEvaluate } from './utils'
 
 async function parser(URL: string) {
   const { browser, page } = await init(URL, { headless: true })
@@ -55,7 +53,7 @@ async function parser(URL: string) {
       const floor = await evaluate(AD_FLOOR)
 
       // фильтр для некорректных объявлений
-      id && ads.push({ id, href, price, title, square, rooms, floor })
+      if (id) ads.push({ id, href, price, title, square, rooms, floor })
     }
 
     ++CURRENT_PAGE
@@ -70,4 +68,6 @@ async function parser(URL: string) {
   return ads.length === countAllAds
 }
 
-parser(START_PREPARED_URL).then((result) => console.log('PARSING-SUCCESS: ', result))
+parser(START_PREPARED_URL)
+  .then((result) => console.log('PARSING-SUCCESS: ', result))
+  .catch((err) => console.log(err))

@@ -1,4 +1,4 @@
-import { Page, ElementHandle } from 'puppeteer'
+import { ElementHandle, Page } from 'puppeteer'
 
 import { INNER_TEXT } from '../constants'
 

@@ -8,7 +8,7 @@ async function init(url: string, options: { headless: boolean }) {
 
   await page.setViewport({
     width: 1920,
-    height: 1080,
+    height: 1080
   })
 
   await page.goto(url, { waitUntil: NETWORK_IDLE_2 })
