@@ -10,7 +10,7 @@
     "ts-build": "tsc -p tsconfig-build.json",
     "ts-check": "tsc -p tsconfig-check.json",
     "lint-check": "eslint --config .eslintrc.json .",
-    "all-cheks": "yarn run lint-check && yarn run ts-check",
+    "all-cheks": "yarn run ts-check && yarn run lint-check",
     "clean-build": "rimraf ./dist"
 
   },

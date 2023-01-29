@@ -1,3 +1,4 @@
-export const INNER_TEXT = 'innerText'
-
-export const HREF = 'href'
+export enum PROPERTIES {
+  HREF = 'href',
+  INNER_TEXT = 'innerText'
+}

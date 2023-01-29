@@ -1,5 +1,7 @@
+// import * as fs from 'fs'
+
 import { init } from '../init'
-import { HREF, START_PREPARED_URL, START_URL } from './constants'
+import { PROPERTIES, START_PREPARED_URL, START_URL } from './constants'
 import {
   AD,
   AD_FLOOR,
@@ -10,19 +12,22 @@ import {
   AD_TITLE,
   COUNT_OF_ALL_ADS
 } from './selectors'
-import { curryEvaluate } from './utils'
+import { curryEvaluate, getPreparedData } from './utils'
 
 async function parser(URL: string) {
   const { browser, page } = await init(URL, { headless: true })
+  const { INNER_TEXT, HREF } = PROPERTIES
 
   // количество объявлений по выбранным фильтрам
   const countAllAdsNode = await page.$(COUNT_OF_ALL_ADS)
-  const countAllAds = Number(
-    await page.evaluate((number) => {
-      return number?.innerText
-    }, countAllAdsNode)
-  )
+  const countAllAds = await page.evaluate((countAllAds) => {
+    const result = countAllAds?.innerText
+    return result ? Number(result) : undefined
+  }, countAllAdsNode)
   console.log('countAllAds: ', countAllAds) // 27
+
+  // проверка корректности парсинга количества всех объявлений
+  if (!countAllAds) throw Error('Selector "countAllAds" is undefined!')
 
   // количество объявлений на странице
   const countAllAdsNodeOnPage = await page.$$(AD_ID)
@@ -44,16 +49,44 @@ async function parser(URL: string) {
     for (const adNode of adsNode) {
       const evaluate = curryEvaluate(page, adNode)
 
-      const id = await evaluate(AD_ID)
+      const id = await evaluate(AD_ID, INNER_TEXT)
+      const price = await evaluate(AD_PRICE, INNER_TEXT)
       const href = await evaluate(AD_TITLE, HREF)
-      const price = await evaluate(AD_PRICE)
-      const title = await evaluate(AD_TITLE)
-      const square = await evaluate(AD_SQUARE)
-      const rooms = await evaluate(AD_ROOMS)
-      const floor = await evaluate(AD_FLOOR)
+      const title = await evaluate(AD_TITLE, INNER_TEXT)
+      const square = await evaluate(AD_SQUARE, INNER_TEXT)
+      const rooms = await evaluate(AD_ROOMS, INNER_TEXT)
+      const floor = await evaluate(AD_FLOOR, INNER_TEXT)
+
+      if (id) {
+        const preparedData = getPreparedData({
+          id
+          // price
+          // href,
+          // title,
+          // square,
+          // rooms,
+          // floor
+        })
+
+        console.log('preparedData: ', preparedData)
+      }
 
       // фильтр для некорректных объявлений
-      if (id) ads.push({ id, href, price, title, square, rooms, floor })
+      if (id) {
+        ads.push({ id, price, href, title, square, rooms, floor })
+
+        // fs.appendFile(
+        //   'message.csv',
+        //   `${title.replace(
+        //     /,/g,
+        //     '%2C'
+        //   )},${price},${href},${title},${square},${rooms},${floor}`,
+        //   (err) => {
+        //     if (err) throw err
+        //     console.log('The "data to append" was appended to file!')
+        //   }
+        // )
+      }
     }
 
     ++CURRENT_PAGE
