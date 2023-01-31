@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer'
 
-import { NETWORK_IDLE_2 } from './realt.by/constants'
+import { NETWORK_IDLE_2 } from './constants'
 
 async function init(url: string, options: { headless: boolean }) {
   const browser = await puppeteer.launch({ headless: options.headless })

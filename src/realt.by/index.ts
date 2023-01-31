@@ -1,6 +1,5 @@
 import * as fs from 'fs'
 
-import { init } from '../init'
 import {
   FILE_NAME,
   FIRST_ROW,
@@ -8,6 +7,7 @@ import {
   START_PREPARED_URL,
   START_URL
 } from './constants'
+import { init } from './init'
 import {
   AD,
   AD_FLOOR,
