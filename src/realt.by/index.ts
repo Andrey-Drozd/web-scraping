@@ -1,9 +1,8 @@
-import * as fs from 'fs'
-
 import {
-  FILE_NAME,
   FIRST_ROW,
   PROPERTIES,
+  REALT_BY,
+  RESULTS_PATH,
   START_PREPARED_URL,
   START_URL
 } from './constants'
@@ -19,15 +18,20 @@ import {
   COUNT_OF_ALL_ADS
 } from './selectors'
 import {
+  checkIsFolderForFiles,
   curryEvaluate,
   getFileData,
   getPreparedData,
-  getRowData
+  getRowData,
+  writeFirstRow,
+  writeRow
 } from './utils'
 
 async function parser(URL: string) {
   const { browser, page } = await init(URL, { headless: true })
   const { INNER_TEXT, HREF } = PROPERTIES
+
+  checkIsFolderForFiles(RESULTS_PATH)
 
   // количество объявлений по выбранным фильтрам
   const countAllAdsNode = await page.$(COUNT_OF_ALL_ADS)
@@ -35,52 +39,27 @@ async function parser(URL: string) {
     const result = countAllAds?.innerText
     return result ? Number(result) : null
   }, countAllAdsNode)
-  console.log('countAllAds: ', countAllAds) // 27
+  console.log('LOG | parsing > countAllAds: ', countAllAds)
 
   // проверка корректности парсинга количества всех объявлений
-  if (!countAllAds) throw Error('Selector "countAllAds" is undefined!')
+  if (!countAllAds) throw Error('LOG | selector "countAllAds" is undefined!')
 
   // количество объявлений на странице
   const countAllAdsNodeOnPage = await page.$$(AD_ID)
-  console.log('countAllAdsNodeOnPage: ', countAllAdsNodeOnPage.length) // 10
+  console.log(
+    'LOG | parsing > countAllAdsNodeOnPage: ',
+    countAllAdsNodeOnPage.length
+  )
 
   // количество страниц парсинга
   const countPages = Math.ceil(countAllAds / countAllAdsNodeOnPage.length)
-  console.log('страниц всего: ', countPages) // 3
+  console.log('LOG | parsing > countPages: ', countPages)
 
   // данные парсинга
   const ads = []
 
   let CURRENT_PAGE = 0
-
-  // eslint-disable-next-line consistent-return
-  // fs.access(`./${FILE_NAME}`, fs.constants.F_OK, (err) => {
-  //   if (err) {
-  //     fs.appendFile(FILE_NAME, FIRST_ROW, (err) => {
-  //       if (err) throw err
-  //     })
-  //     console.log(`файл создан с названием: ${FILE_NAME}`)
-  //   }
-  //
-  //   // fs.unlink(`./${FILE_NAME}`, (err) => {
-  //   //   if (err) throw err
-  //   //   console.log(`файл был удален по пути: ./${FILE_NAME}`)
-  //   // })
-  //   //
-  //   // fs.appendFile(FILE_NAME, FIRST_ROW, (err) => {
-  //   //   if (err) throw err
-  //   // })
-  //   // console.log(`файл создан с названием: ${FILE_NAME}`)
-  // })
-
-  fs.access(`./${FILE_NAME}`, fs.constants.F_OK, (e) => {
-    if (e) {
-      console.log('файла нет')
-      return
-    }
-
-    console.log('файл есть')
-  })
+  let IS_FIRST_ROW = false
 
   while (countPages > CURRENT_PAGE) {
     const adsNode = await page.$$(AD)
@@ -123,17 +102,31 @@ async function parser(URL: string) {
         const fileData = getFileData(preparedData)
         const rowData = getRowData(fileData)
 
-        // console.log(lineData)
+        if (!IS_FIRST_ROW) {
+          writeFirstRow({
+            path: RESULTS_PATH,
+            fileName: REALT_BY,
+            row: FIRST_ROW
+          })
 
-        fs.appendFile('results.csv', rowData, (err) => {
-          if (err) throw err
+          IS_FIRST_ROW = true
+        }
+
+        writeRow({
+          path: RESULTS_PATH,
+          fileName: REALT_BY,
+          row: rowData
         })
       }
     }
 
     ++CURRENT_PAGE
-    // console.log('nextPage: ', `${START_URL}&page=${CURRENT_PAGE}`)
-    await page.goto(`${START_URL}&page=${CURRENT_PAGE}`)
+
+    const NEXT_PAGE = `${START_URL}&page=${CURRENT_PAGE}`
+
+    console.log('LOG | parsing > nextPage: ', NEXT_PAGE)
+
+    await page.goto(NEXT_PAGE)
   }
 
   // ads.forEach((ad) => console.log(ad))

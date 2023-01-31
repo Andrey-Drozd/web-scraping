@@ -39,5 +39,5 @@ export const getFileData = (data: TPreparedData): TFileData => {
 export const getRowData = (data: TFileData): string => {
   const { id, price, href, title, square, rooms, floor, totalFloors } = data
 
-  return `${id};${title};${price};${href};${square};${rooms};${floor};${totalFloors}\n`
+  return `${id};${title};${price};${href};${square};${rooms};${floor};${totalFloors}`
 }
