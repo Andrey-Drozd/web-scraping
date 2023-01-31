@@ -1,4 +1,6 @@
-export const REALT_BY = 'realt.by.csv'
+export const CSV = 'csv'
+
+export const REALT_BY = 'realt.by'
 
 export const RESULTS_PATH = './public/results/'
 

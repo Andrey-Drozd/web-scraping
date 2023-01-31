@@ -12,9 +12,9 @@
     "lint-check": "eslint --config .eslintrc.json .",
     "all-cheks": "yarn run ts-check && yarn run lint-check",
     "clean-build": "rimraf ./dist"
-
   },
   "dependencies": {
+    "dayjs": "^1.11.7",
     "puppeteer": "^19.4.1"
   },
   "devDependencies": {

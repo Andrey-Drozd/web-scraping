@@ -22,6 +22,11 @@
   },
   "rules": {
     "import/prefer-default-export": "off",
+    "import/no-extraneous-dependencies": [
+      "error", {
+        "devDependencies": true
+      }
+    ],
     "sort-imports" : "off",
     "import/order": "off",
     "simple-import-sort/imports": "error",

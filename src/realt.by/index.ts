@@ -1,4 +1,5 @@
 import {
+  CSV,
   FIRST_ROW,
   PROPERTIES,
   REALT_BY,
@@ -17,6 +18,7 @@ import {
   AD_TITLE,
   COUNT_OF_ALL_ADS
 } from './selectors'
+import { dateServices } from './services'
 import {
   checkIsFolderForFiles,
   curryEvaluate,
@@ -30,6 +32,7 @@ import {
 async function parser(URL: string) {
   const { browser, page } = await init(URL, { headless: true })
   const { INNER_TEXT, HREF } = PROPERTIES
+  const dateTime = dateServices.getDateTime()
 
   checkIsFolderForFiles(RESULTS_PATH)
 
@@ -105,7 +108,7 @@ async function parser(URL: string) {
         if (!IS_FIRST_ROW) {
           writeFirstRow({
             path: RESULTS_PATH,
-            fileName: REALT_BY,
+            fileName: `${REALT_BY}_${dateTime}.${CSV}`,
             row: FIRST_ROW
           })
 
@@ -114,7 +117,7 @@ async function parser(URL: string) {
 
         writeRow({
           path: RESULTS_PATH,
-          fileName: REALT_BY,
+          fileName: `${REALT_BY}_${dateTime}.${CSV}`,
           row: rowData
         })
       }
