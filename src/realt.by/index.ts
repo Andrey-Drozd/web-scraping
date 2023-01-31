@@ -1,7 +1,13 @@
-// import * as fs from 'fs'
+import * as fs from 'fs'
 
 import { init } from '../init'
-import { PROPERTIES, START_PREPARED_URL, START_URL } from './constants'
+import {
+  FILE_NAME,
+  FIRST_ROW,
+  PROPERTIES,
+  START_PREPARED_URL,
+  START_URL
+} from './constants'
 import {
   AD,
   AD_FLOOR,
@@ -12,7 +18,12 @@ import {
   AD_TITLE,
   COUNT_OF_ALL_ADS
 } from './selectors'
-import { curryEvaluate, getPreparedData } from './utils'
+import {
+  curryEvaluate,
+  getFileData,
+  getPreparedData,
+  getRowData
+} from './utils'
 
 async function parser(URL: string) {
   const { browser, page } = await init(URL, { headless: true })
@@ -22,7 +33,7 @@ async function parser(URL: string) {
   const countAllAdsNode = await page.$(COUNT_OF_ALL_ADS)
   const countAllAds = await page.evaluate((countAllAds) => {
     const result = countAllAds?.innerText
-    return result ? Number(result) : undefined
+    return result ? Number(result) : null
   }, countAllAdsNode)
   console.log('countAllAds: ', countAllAds) // 27
 
@@ -42,6 +53,35 @@ async function parser(URL: string) {
 
   let CURRENT_PAGE = 0
 
+  // eslint-disable-next-line consistent-return
+  // fs.access(`./${FILE_NAME}`, fs.constants.F_OK, (err) => {
+  //   if (err) {
+  //     fs.appendFile(FILE_NAME, FIRST_ROW, (err) => {
+  //       if (err) throw err
+  //     })
+  //     console.log(`файл создан с названием: ${FILE_NAME}`)
+  //   }
+  //
+  //   // fs.unlink(`./${FILE_NAME}`, (err) => {
+  //   //   if (err) throw err
+  //   //   console.log(`файл был удален по пути: ./${FILE_NAME}`)
+  //   // })
+  //   //
+  //   // fs.appendFile(FILE_NAME, FIRST_ROW, (err) => {
+  //   //   if (err) throw err
+  //   // })
+  //   // console.log(`файл создан с названием: ${FILE_NAME}`)
+  // })
+
+  fs.access(`./${FILE_NAME}`, fs.constants.F_OK, (e) => {
+    if (e) {
+      console.log('файла нет')
+      return
+    }
+
+    console.log('файл есть')
+  })
+
   while (countPages > CURRENT_PAGE) {
     const adsNode = await page.$$(AD)
 
@@ -57,35 +97,37 @@ async function parser(URL: string) {
       const rooms = await evaluate(AD_ROOMS, INNER_TEXT)
       const floor = await evaluate(AD_FLOOR, INNER_TEXT)
 
-      if (id) {
-        const preparedData = getPreparedData({
-          id
-          // price
-          // href,
-          // title,
-          // square,
-          // rooms,
-          // floor
-        })
-
-        console.log('preparedData: ', preparedData)
-      }
-
       // фильтр для некорректных объявлений
       if (id) {
-        ads.push({ id, price, href, title, square, rooms, floor })
+        const preparedData = getPreparedData({
+          id,
+          price,
+          href,
+          title,
+          square,
+          rooms,
+          floor
+        })
 
-        // fs.appendFile(
-        //   'message.csv',
-        //   `${title.replace(
-        //     /,/g,
-        //     '%2C'
-        //   )},${price},${href},${title},${square},${rooms},${floor}`,
-        //   (err) => {
-        //     if (err) throw err
-        //     console.log('The "data to append" was appended to file!')
-        //   }
-        // )
+        ads.push({
+          id: preparedData.id,
+          price: preparedData.price,
+          href: preparedData.href,
+          title: preparedData.title,
+          square: preparedData.square,
+          rooms: preparedData.rooms,
+          floor: preparedData.floor,
+          totalFloors: preparedData.totalFloors
+        })
+
+        const fileData = getFileData(preparedData)
+        const rowData = getRowData(fileData)
+
+        // console.log(lineData)
+
+        fs.appendFile('results.csv', rowData, (err) => {
+          if (err) throw err
+        })
       }
     }
 
@@ -94,7 +136,7 @@ async function parser(URL: string) {
     await page.goto(`${START_URL}&page=${CURRENT_PAGE}`)
   }
 
-  ads.forEach((ad) => console.log(ad))
+  // ads.forEach((ad) => console.log(ad))
 
   await browser.close()
 
