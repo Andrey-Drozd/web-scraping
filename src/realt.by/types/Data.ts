@@ -1,4 +1,4 @@
-export type TParamsPreparedData = {
+export type TAd = {
   id: string
   info: string | null
   title: string | null
@@ -12,7 +12,7 @@ export type TParamsPreparedData = {
   floors: string | null
 }
 
-export type TPreparedData = {
+export type TPreparedAd = {
   id: number
   title: string | null
   url: string | null
@@ -28,7 +28,7 @@ export type TPreparedData = {
   floorTop: string | null
 }
 
-export type TFileData = {
+export type TPreparedAdForCsv = {
   id: string
   title: string
   url: string

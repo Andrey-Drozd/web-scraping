@@ -1,7 +1,11 @@
+import { uniqBy } from 'lodash'
+
 import {
   CSV,
   FIRST_ROW,
+  LOG_FILE,
   LOG_PARSING,
+  PAGE,
   PROPERTIES,
   REALT_BY,
   RESULTS_PATH,
@@ -26,13 +30,13 @@ import {
   METRO_RED
 } from './selectors'
 import { dateServices } from './services'
-import { TPreparedData } from './types'
+import { TPreparedAd } from './types'
 import {
   checkIsFolderForFiles,
   curryEvaluate,
-  getFileData,
-  getPreparedData,
-  getRowData,
+  getPreparedAd,
+  getPreparedAdForCsv,
+  getRowAdForCsv,
   writeFirstRow,
   writeRow
 } from './utils'
@@ -66,16 +70,12 @@ async function parser(URL: string) {
   const countPages = Math.ceil(countAllAds / countAllAdsNodeOnPage.length)
   console.log(`${LOG_PARSING}countPages: `, countPages)
 
-  // данные парсинга
-  const ads: TPreparedData[] = []
-
-  let CURRENT_PAGE = 0
-  let IS_FIRST_ROW = false
+  const ads: TPreparedAd[] = []
+  let CURRENT_PAGE = PAGE
 
   while (countPages > CURRENT_PAGE) {
     const adsNode = await page.$$(AD)
 
-    // получение данных с текущей страницы
     for (const adNode of adsNode) {
       const evaluate = curryEvaluate(page, adNode)
 
@@ -93,9 +93,8 @@ async function parser(URL: string) {
       const rooms = await evaluate(AD_ROOMS, INNER_TEXT)
       const floors = await evaluate(AD_FLOOR, INNER_TEXT)
 
-      // фильтр для некорректных объявлений
       if (id) {
-        const preparedData = getPreparedData({
+        const preparedAd = getPreparedAd({
           id,
           info,
           title,
@@ -110,63 +109,65 @@ async function parser(URL: string) {
         })
 
         ads.push({
-          id: preparedData.id,
-          title: preparedData.title,
-          url: preparedData.url,
-          date: preparedData.date,
-          views: preparedData.views,
-          price: preparedData.price,
-          city: preparedData.city,
-          metro: preparedData.metro,
-          square: preparedData.square,
-          rooms: preparedData.rooms,
-          floor: preparedData.floor,
-          floors: preparedData.floors,
-          floorTop: preparedData.floorTop
-        })
-
-        const fileData = getFileData(preparedData)
-        const rowData = getRowData(fileData)
-
-        if (!IS_FIRST_ROW) {
-          writeFirstRow({
-            path: RESULTS_PATH,
-            fileName: `${REALT_BY}_${dateTime}.${CSV}`,
-            row: FIRST_ROW
-          })
-          IS_FIRST_ROW = true
-        }
-
-        writeRow({
-          path: RESULTS_PATH,
-          fileName: `${REALT_BY}_${dateTime}.${CSV}`,
-          row: rowData
+          id: preparedAd.id,
+          title: preparedAd.title,
+          url: preparedAd.url,
+          date: preparedAd.date,
+          views: preparedAd.views,
+          price: preparedAd.price,
+          city: preparedAd.city,
+          metro: preparedAd.metro,
+          square: preparedAd.square,
+          rooms: preparedAd.rooms,
+          floor: preparedAd.floor,
+          floors: preparedAd.floors,
+          floorTop: preparedAd.floorTop
         })
       }
     }
 
     ++CURRENT_PAGE
-
     const NEXT_PAGE = `${START_URL}&page=${CURRENT_PAGE}`
     console.log(`${LOG_PARSING}nextPage: `, NEXT_PAGE)
     await page.goto(NEXT_PAGE)
   }
 
-  // ads.forEach((ad) => console.log(ad))
+  console.log(`${LOG_PARSING}Парсинг завершен успешно`)
+  console.log(`${LOG_FILE}Создание файла: ${REALT_BY}_${dateTime}.${CSV}`)
+  writeFirstRow({
+    path: RESULTS_PATH,
+    fileName: `${REALT_BY}_${dateTime}.${CSV}`,
+    row: FIRST_ROW
+  })
+
+  const uniqueAds = uniqBy(ads, 'id') as TPreparedAd[]
+  console.log(`${LOG_FILE}Сохранение данных`)
+  uniqueAds.forEach((ad) => {
+    const preparedAd = getPreparedAdForCsv(ad)
+    const row = getRowAdForCsv(preparedAd)
+
+    writeRow({
+      path: RESULTS_PATH,
+      fileName: `${REALT_BY}_${dateTime}.${CSV}`,
+      row
+    })
+  })
 
   await browser.close()
 
   return {
-    countAds: countAllAds,
-    countAdsParsing: ads.length,
-    check: ads.length === countAllAds
+    countAds: countAllAds
+    // TODO
+    // countAdsParsing: ads.length,
+    // check: ads.length === countAllAds
   }
 }
 
 parser(START_PREPARED_URL)
   .then((result) => {
     console.log(`${LOG_PARSING}countAds: `, result.countAds)
-    console.log(`${LOG_PARSING}countAdsParsingS: `, result.countAdsParsing)
-    console.log(`${LOG_PARSING}PARSING-SUCCESS: `, result.check)
+    // TODO
+    // console.log(`${LOG_PARSING}countAdsParsing: `, result.countAdsParsing)
+    // console.log(`${LOG_PARSING}PARSING-SUCCESS: `, result.check)
   })
   .catch((err) => console.log(err))

@@ -1,6 +1,6 @@
-import { TFileData, TParamsPreparedData, TPreparedData } from '../types'
+import { TAd, TPreparedAd, TPreparedAdForCsv } from '../types'
 
-export const getPreparedData = (params: TParamsPreparedData): TPreparedData => {
+export const getPreparedAd = (params: TAd): TPreparedAd => {
   const {
     id: propId,
     info,
@@ -57,7 +57,7 @@ export const getPreparedData = (params: TParamsPreparedData): TPreparedData => {
   }
 }
 
-export const getFileData = (data: TPreparedData): TFileData => {
+export const getPreparedAdForCsv = (data: TPreparedAd): TPreparedAdForCsv => {
   const {
     id,
     title,
@@ -91,7 +91,7 @@ export const getFileData = (data: TPreparedData): TFileData => {
   }
 }
 
-export const getRowData = (data: TFileData): string => {
+export const getRowAdForCsv = (data: TPreparedAdForCsv): string => {
   const {
     id,
     title,
