@@ -1,10 +1,12 @@
 import fs from 'fs'
 
+import { LOG_SERVER } from '../constants'
+
 export const mkdirSync = (path: string, callback?: () => void) => {
   try {
     fs.mkdirSync(path, fs.constants.R_OK)
 
-    console.log(`LOG | Папка по пути: ${path} создана`)
+    console.log(`${LOG_SERVER}Папка по пути: ${path} создана`)
 
     if (callback) callback()
   } catch (err) {
@@ -41,7 +43,7 @@ export const accessSync = (path: string, callback?: () => void) => {
   try {
     fs.accessSync(path, fs.constants.R_OK)
   } catch (err) {
-    console.log(`LOG | Папка по пути: ${path} не существует`)
+    console.log(`${LOG_SERVER}Папка по пути: ${path} не существует`)
 
     if (callback) callback()
   }

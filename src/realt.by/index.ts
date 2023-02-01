@@ -1,6 +1,7 @@
 import {
   CSV,
   FIRST_ROW,
+  LOG_PARSING,
   PROPERTIES,
   REALT_BY,
   RESULTS_PATH,
@@ -10,15 +11,22 @@ import {
 import { init } from './init'
 import {
   AD,
+  AD_CITY,
+  AD_DATE,
   AD_FLOOR,
   AD_ID,
   AD_PRICE,
   AD_ROOMS,
   AD_SQUARE,
   AD_TITLE,
-  COUNT_OF_ALL_ADS
+  COUNT_OF_ALL_ADS,
+  METRO_BLUE,
+  METRO_GREEN,
+  METRO_RED,
+  VIEWS
 } from './selectors'
 import { dateServices } from './services'
+import { TPreparedData } from './types'
 import {
   checkIsFolderForFiles,
   curryEvaluate,
@@ -42,24 +50,24 @@ async function parser(URL: string) {
     const result = countAllAds?.innerText
     return result ? Number(result) : null
   }, countAllAdsNode)
-  console.log('LOG | parsing > countAllAds: ', countAllAds)
+  console.log(`${LOG_PARSING}countAllAds: `, countAllAds)
 
   // проверка корректности парсинга количества всех объявлений
-  if (!countAllAds) throw Error('LOG | selector "countAllAds" is undefined!')
+  if (!countAllAds) throw Error(`${LOG_PARSING}countAllAds is undefined!`)
 
   // количество объявлений на странице
   const countAllAdsNodeOnPage = await page.$$(AD_ID)
   console.log(
-    'LOG | parsing > countAllAdsNodeOnPage: ',
+    `${LOG_PARSING}countAllAdsNodeOnPage: `,
     countAllAdsNodeOnPage.length
   )
 
   // количество страниц парсинга
   const countPages = Math.ceil(countAllAds / countAllAdsNodeOnPage.length)
-  console.log('LOG | parsing > countPages: ', countPages)
+  console.log(`${LOG_PARSING}countPages: `, countPages)
 
   // данные парсинга
-  const ads = []
+  const ads: TPreparedData[] = []
 
   let CURRENT_PAGE = 0
   let IS_FIRST_ROW = false
@@ -72,9 +80,15 @@ async function parser(URL: string) {
       const evaluate = curryEvaluate(page, adNode)
 
       const id = await evaluate(AD_ID, INNER_TEXT)
-      const price = await evaluate(AD_PRICE, INNER_TEXT)
-      const href = await evaluate(AD_TITLE, HREF)
       const title = await evaluate(AD_TITLE, INNER_TEXT)
+      const href = await evaluate(AD_TITLE, HREF)
+      const date = await evaluate(AD_DATE, INNER_TEXT)
+      const views = await evaluate(VIEWS, INNER_TEXT)
+      const price = await evaluate(AD_PRICE, INNER_TEXT)
+      const city = await evaluate(AD_CITY, INNER_TEXT)
+      const metroGreen = await evaluate(METRO_GREEN, INNER_TEXT)
+      const metroBlue = await evaluate(METRO_BLUE, INNER_TEXT)
+      const metroRed = await evaluate(METRO_RED, INNER_TEXT)
       const square = await evaluate(AD_SQUARE, INNER_TEXT)
       const rooms = await evaluate(AD_ROOMS, INNER_TEXT)
       const floor = await evaluate(AD_FLOOR, INNER_TEXT)
@@ -83,9 +97,13 @@ async function parser(URL: string) {
       if (id) {
         const preparedData = getPreparedData({
           id,
-          price,
-          href,
           title,
+          href,
+          date,
+          views,
+          price,
+          city,
+          metro: [metroGreen, metroBlue, metroRed],
           square,
           rooms,
           floor
@@ -93,13 +111,18 @@ async function parser(URL: string) {
 
         ads.push({
           id: preparedData.id,
-          price: preparedData.price,
-          href: preparedData.href,
           title: preparedData.title,
+          href: preparedData.href,
+          date: preparedData.date,
+          views: preparedData.views,
+          price: preparedData.price,
+          city: preparedData.city,
+          metro: preparedData.metro,
           square: preparedData.square,
           rooms: preparedData.rooms,
           floor: preparedData.floor,
-          totalFloors: preparedData.totalFloors
+          floors: preparedData.floors,
+          floorTop: preparedData.floorTop
         })
 
         const fileData = getFileData(preparedData)
@@ -111,7 +134,6 @@ async function parser(URL: string) {
             fileName: `${REALT_BY}_${dateTime}.${CSV}`,
             row: FIRST_ROW
           })
-
           IS_FIRST_ROW = true
         }
 
@@ -126,9 +148,7 @@ async function parser(URL: string) {
     ++CURRENT_PAGE
 
     const NEXT_PAGE = `${START_URL}&page=${CURRENT_PAGE}`
-
-    console.log('LOG | parsing > nextPage: ', NEXT_PAGE)
-
+    console.log(`${LOG_PARSING}nextPage: `, NEXT_PAGE)
     await page.goto(NEXT_PAGE)
   }
 
@@ -140,5 +160,5 @@ async function parser(URL: string) {
 }
 
 parser(START_PREPARED_URL)
-  .then((result) => console.log('PARSING-SUCCESS: ', result))
+  .then((result) => console.log(`${LOG_PARSING}PARSING-SUCCESS: `, result))
   .catch((err) => console.log(err))

@@ -4,4 +4,5 @@ export const REALT_BY = 'realt.by'
 
 export const RESULTS_PATH = './public/results/'
 
-export const FIRST_ROW = 'ID;TITLE;PRICE;HREF;SQUARE;ROOMS;FLOOR;TOTAL_FLOORS'
+export const FIRST_ROW =
+  'ID;TITLE;HREF;DATE;VIEWS;PRICE;CITY;METRO;SQUARE;ROOMS;FLOOR;FLOORS;FLOOR_TOP'
