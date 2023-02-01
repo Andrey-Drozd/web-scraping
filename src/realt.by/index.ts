@@ -156,9 +156,17 @@ async function parser(URL: string) {
 
   await browser.close()
 
-  return ads.length === countAllAds
+  return {
+    countAds: countAllAds,
+    countAdsParsing: ads.length,
+    check: ads.length === countAllAds
+  }
 }
 
 parser(START_PREPARED_URL)
-  .then((result) => console.log(`${LOG_PARSING}PARSING-SUCCESS: `, result))
+  .then((result) => {
+    console.log(`${LOG_PARSING}countAds: `, result.countAds)
+    console.log(`${LOG_PARSING}countAdsParsingS: `, result.countAdsParsing)
+    console.log(`${LOG_PARSING}PARSING-SUCCESS: `, result.check)
+  })
   .catch((err) => console.log(err))
