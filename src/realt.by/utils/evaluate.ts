@@ -9,7 +9,7 @@ export const curryEvaluate = (
   return async (selector: string, currentProperty: PROPERTIES) => {
     return page.evaluate(
       (node, selector, currentProperty, PROPERTIES) => {
-        const { HREF, INNER_TEXT } = PROPERTIES
+        const { HREF, INNER_TEXT, INNER_HTML } = PROPERTIES
         const nodeElement: HTMLDivElement | null = node.querySelector(selector)
 
         if (!nodeElement) return null
@@ -19,6 +19,8 @@ export const curryEvaluate = (
             return nodeElement[INNER_TEXT]
           case HREF:
             return nodeElement[HREF as keyof typeof nodeElement] as string
+          case INNER_HTML:
+            return nodeElement[INNER_HTML]
           default:
             return null
         }

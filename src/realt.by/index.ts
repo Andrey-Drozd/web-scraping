@@ -12,18 +12,18 @@ import { init } from './init'
 import {
   AD,
   AD_CITY,
-  AD_DATE,
   AD_FLOOR,
   AD_ID,
+  AD_INFO,
   AD_PRICE,
   AD_ROOMS,
   AD_SQUARE,
   AD_TITLE,
+  AD_VIEWS,
   COUNT_OF_ALL_ADS,
   METRO_BLUE,
   METRO_GREEN,
-  METRO_RED,
-  VIEWS
+  METRO_RED
 } from './selectors'
 import { dateServices } from './services'
 import { TPreparedData } from './types'
@@ -39,7 +39,7 @@ import {
 
 async function parser(URL: string) {
   const { browser, page } = await init(URL, { headless: true })
-  const { INNER_TEXT, HREF } = PROPERTIES
+  const { INNER_TEXT, HREF, INNER_HTML } = PROPERTIES
   const dateTime = dateServices.getDateTime()
 
   checkIsFolderForFiles(RESULTS_PATH)
@@ -80,10 +80,10 @@ async function parser(URL: string) {
       const evaluate = curryEvaluate(page, adNode)
 
       const id = await evaluate(AD_ID, INNER_TEXT)
+      const info = await evaluate(AD_INFO, INNER_HTML)
       const title = await evaluate(AD_TITLE, INNER_TEXT)
       const url = await evaluate(AD_TITLE, HREF)
-      const date = await evaluate(AD_DATE, INNER_TEXT)
-      const views = await evaluate(VIEWS, INNER_TEXT)
+      const views = await evaluate(AD_VIEWS, INNER_TEXT)
       const price = await evaluate(AD_PRICE, INNER_TEXT)
       const city = await evaluate(AD_CITY, INNER_TEXT)
       const metroGreen = await evaluate(METRO_GREEN, INNER_TEXT)
@@ -91,22 +91,22 @@ async function parser(URL: string) {
       const metroRed = await evaluate(METRO_RED, INNER_TEXT)
       const square = await evaluate(AD_SQUARE, INNER_TEXT)
       const rooms = await evaluate(AD_ROOMS, INNER_TEXT)
-      const floor = await evaluate(AD_FLOOR, INNER_TEXT)
+      const floors = await evaluate(AD_FLOOR, INNER_TEXT)
 
       // фильтр для некорректных объявлений
       if (id) {
         const preparedData = getPreparedData({
           id,
+          info,
           title,
           url,
-          date,
           views,
           price,
           city,
           metro: [metroGreen, metroBlue, metroRed],
           square,
           rooms,
-          floor
+          floors
         })
 
         ads.push({

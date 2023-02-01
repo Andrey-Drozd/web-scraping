@@ -1,15 +1,15 @@
 export type TParamsPreparedData = {
   id: string
+  info: string | null
   title: string | null
   url: string | null
-  date: string | null
   views: string | null
   price: string | null
   city: string | null
   metro: Array<string | null>
   square: string | null
   rooms: string | null
-  floor: string | null
+  floors: string | null
 }
 
 export type TPreparedData = {

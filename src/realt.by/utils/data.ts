@@ -2,42 +2,58 @@ import { TFileData, TParamsPreparedData, TPreparedData } from '../types'
 
 export const getPreparedData = (params: TParamsPreparedData): TPreparedData => {
   const {
+    id: propId,
+    info,
+    title: propTitle,
+    url: propUrl,
+    views: propViews,
+    price: propPrice,
+    city: propCity,
+    metro: propMetro,
+    square: propSquare,
+    rooms: propRooms,
+    floors: propFloors
+  } = params
+
+  const id = Number(propId.replace(/\D/g, ''))
+  const title = propTitle ? String(propTitle.replace(/;/g, '%3B').trim()) : null
+  const url = propUrl ? String(propUrl) : null
+  const dateRegex = info?.match(/[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}/gm)
+  const date = dateRegex ? dateRegex[0] : null
+  const views = propViews ? Number(propViews) : null
+  const price = propPrice ? Number(propPrice.replace(/\D/g, '')) : null
+  const cityPrepared = propCity?.split(',')[0]
+  const city = cityPrepared ? cityPrepared.trim() : ''
+  const metroPrepared = propMetro.find((metro) => metro !== null)
+  const metro = metroPrepared ? metroPrepared.trim() : ''
+  const square = propSquare
+    ? Math.ceil(Number(propSquare.replace(/м\n2/g, '')))
+    : null
+  const rooms = propRooms ? Number(propRooms.replace(/-комн\./g, '')) : null
+  const propFloorsPrepared =
+    propFloors && String(propFloors.replace(/этаж/g, '').trim())
+  const propFloorsPreparedSplit = propFloorsPrepared
+    ? propFloorsPrepared.split('/')
+    : null
+  const floor = propFloorsPreparedSplit && Number(propFloorsPreparedSplit[0])
+  const floors = propFloorsPreparedSplit && Number(propFloorsPreparedSplit[1])
+  const floorTopPrepared = floor ? floor === floors : null
+  const floorTop = floorTopPrepared ? '+' : ''
+
+  return {
     id,
     title,
     url,
     date,
     views,
     price,
-    city: cityProp,
-    metro: metroProp,
+    city,
+    metro,
     square,
     rooms,
-    floor
-  } = params
-
-  const preparedFloors = floor && String(floor.replace(/этаж/g, '').trim())
-  const preparedFloorsSplit = preparedFloors ? preparedFloors.split('/') : null
-  const preparedFloor = preparedFloorsSplit && Number(preparedFloorsSplit[0])
-  const preparedFloorsTotal =
-    preparedFloorsSplit && Number(preparedFloorsSplit[1])
-  const floorTop = preparedFloor ? preparedFloor === preparedFloorsTotal : null
-  const city = cityProp ? cityProp.split(',')[0] : ''
-  const metro = metroProp.find((metro) => metro !== null)
-
-  return {
-    id: Number(id.replace(/\D/g, '')),
-    title: title ? String(title.replace(/;/g, '%3B').trim()) : null,
-    url: url ? String(url).trim() : null,
-    date: date ? String(date.trim()) : null,
-    views: views ? Number(views) : null,
-    price: price ? Number(price.replace(/\D/g, '')) : null,
-    city: city ? String(city.trim()) : null,
-    metro: metro ? String(metro.trim()) : null,
-    square: square ? Math.ceil(Number(square.replace(/м\n2/g, ''))) : null,
-    rooms: rooms ? Number(rooms.replace(/-комн\./g, '')) : null,
-    floor: preparedFloor || null,
-    floors: preparedFloorsTotal || null,
-    floorTop: floorTop ? '+' : ''
+    floor,
+    floors,
+    floorTop
   }
 }
 
