@@ -4,7 +4,7 @@ export const getPreparedData = (params: TParamsPreparedData): TPreparedData => {
   const {
     id,
     title,
-    href,
+    url,
     date,
     views,
     price,
@@ -27,7 +27,7 @@ export const getPreparedData = (params: TParamsPreparedData): TPreparedData => {
   return {
     id: Number(id.replace(/\D/g, '')),
     title: title ? String(title.replace(/;/g, '%3B').trim()) : null,
-    href: href ? String(href).trim() : null,
+    url: url ? String(url).trim() : null,
     date: date ? String(date.trim()) : null,
     views: views ? Number(views) : null,
     price: price ? Number(price.replace(/\D/g, '')) : null,
@@ -45,7 +45,7 @@ export const getFileData = (data: TPreparedData): TFileData => {
   const {
     id,
     title,
-    href,
+    url,
     date,
     views,
     price,
@@ -61,7 +61,7 @@ export const getFileData = (data: TPreparedData): TFileData => {
   return {
     id: String(id),
     title: title || '',
-    href: href || '',
+    url: url || '',
     date: date || '',
     views: views || 0,
     price: price ? String(price) : '',
@@ -79,7 +79,7 @@ export const getRowData = (data: TFileData): string => {
   const {
     id,
     title,
-    href,
+    url,
     date,
     views,
     price,
@@ -92,5 +92,5 @@ export const getRowData = (data: TFileData): string => {
     floorTop
   } = data
 
-  return `${id};${title};${href};${date};${views};${price};${city};${metro};${square};${rooms};${floor};${floors};${floorTop}`
+  return `${id};${title};${url};${date};${views};${price};${city};${metro};${square};${rooms};${floor};${floors};${floorTop}`
 }

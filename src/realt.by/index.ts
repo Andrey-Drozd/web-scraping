@@ -81,7 +81,7 @@ async function parser(URL: string) {
 
       const id = await evaluate(AD_ID, INNER_TEXT)
       const title = await evaluate(AD_TITLE, INNER_TEXT)
-      const href = await evaluate(AD_TITLE, HREF)
+      const url = await evaluate(AD_TITLE, HREF)
       const date = await evaluate(AD_DATE, INNER_TEXT)
       const views = await evaluate(VIEWS, INNER_TEXT)
       const price = await evaluate(AD_PRICE, INNER_TEXT)
@@ -98,7 +98,7 @@ async function parser(URL: string) {
         const preparedData = getPreparedData({
           id,
           title,
-          href,
+          url,
           date,
           views,
           price,
@@ -112,7 +112,7 @@ async function parser(URL: string) {
         ads.push({
           id: preparedData.id,
           title: preparedData.title,
-          href: preparedData.href,
+          url: preparedData.url,
           date: preparedData.date,
           views: preparedData.views,
           price: preparedData.price,

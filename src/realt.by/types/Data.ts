@@ -1,7 +1,7 @@
 export type TParamsPreparedData = {
   id: string
   title: string | null
-  href: string | null
+  url: string | null
   date: string | null
   views: string | null
   price: string | null
@@ -15,7 +15,7 @@ export type TParamsPreparedData = {
 export type TPreparedData = {
   id: number
   title: string | null
-  href: string | null
+  url: string | null
   date: string | null
   views: number | null
   price: number | null
@@ -31,7 +31,7 @@ export type TPreparedData = {
 export type TFileData = {
   id: string
   title: string
-  href: string
+  url: string
   date: string
   views: number
   price: string
