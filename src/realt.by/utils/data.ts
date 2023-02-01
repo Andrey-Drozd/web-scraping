@@ -20,7 +20,7 @@ export const getPreparedData = (params: TParamsPreparedData): TPreparedData => {
   const preparedFloor = preparedFloorsSplit && Number(preparedFloorsSplit[0])
   const preparedFloorsTotal =
     preparedFloorsSplit && Number(preparedFloorsSplit[1])
-  const floorTop = preparedFloor === preparedFloorsTotal
+  const floorTop = preparedFloor ? preparedFloor === preparedFloorsTotal : null
   const city = cityProp ? cityProp.split(',')[0] : ''
   const metro = metroProp.find((metro) => metro !== null)
 
