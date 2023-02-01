@@ -33,7 +33,7 @@ export const getPreparedData = (params: TParamsPreparedData): TPreparedData => {
     price: price ? Number(price.replace(/\D/g, '')) : null,
     city: city ? String(city.trim()) : null,
     metro: metro ? String(metro.trim()) : null,
-    square: square ? Number(square.replace(/м\n2/g, '')) : null,
+    square: square ? Math.ceil(Number(square.replace(/м\n2/g, ''))) : null,
     rooms: rooms ? Number(rooms.replace(/-комн\./g, '')) : null,
     floor: preparedFloor || null,
     floors: preparedFloorsTotal || null,
