@@ -2,7 +2,7 @@
   "license": "ISC",
   "author": "DROZD ANDREY",
   "name": "PARSER",
-  "description": "puppeteer-parser",
+  "description": "web-scraping",
   "version": "1.0.0",
   "scripts": {
     "start": "node dist/realt.by/index.js",
