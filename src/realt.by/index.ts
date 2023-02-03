@@ -16,12 +16,10 @@ import { init } from './init'
 import {
   AD,
   AD_CITY,
-  AD_FLOOR,
   AD_ID,
-  AD_INFO,
+  AD_INFO_LARGE,
+  AD_INFO_MINI,
   AD_PRICE,
-  AD_ROOMS,
-  AD_SQUARE,
   AD_TITLE,
   AD_VIEWS,
   COUNT_OF_ALL_ADS,
@@ -80,7 +78,8 @@ async function parser(URL: string) {
       const evaluate = curryEvaluate(page, adNode)
 
       const id = await evaluate(AD_ID, INNER_TEXT)
-      const info = await evaluate(AD_INFO, INNER_HTML)
+      const infoMini = await evaluate(AD_INFO_MINI, INNER_HTML)
+      const infoLarge = await evaluate(AD_INFO_LARGE, INNER_HTML)
       const title = await evaluate(AD_TITLE, INNER_TEXT)
       const url = await evaluate(AD_TITLE, HREF)
       const views = await evaluate(AD_VIEWS, INNER_TEXT)
@@ -89,23 +88,18 @@ async function parser(URL: string) {
       const metroGreen = await evaluate(METRO_GREEN, INNER_TEXT)
       const metroBlue = await evaluate(METRO_BLUE, INNER_TEXT)
       const metroRed = await evaluate(METRO_RED, INNER_TEXT)
-      const square = await evaluate(AD_SQUARE, INNER_TEXT)
-      const rooms = await evaluate(AD_ROOMS, INNER_TEXT)
-      const floors = await evaluate(AD_FLOOR, INNER_TEXT)
 
       if (id) {
         const preparedAd = getPreparedAd({
           id,
-          info,
+          infoMini,
+          infoLarge,
           title,
           url,
           views,
           price,
           city,
-          metro: [metroGreen, metroBlue, metroRed],
-          square,
-          rooms,
-          floors
+          metro: [metroGreen, metroBlue, metroRed]
         })
 
         ads.push({

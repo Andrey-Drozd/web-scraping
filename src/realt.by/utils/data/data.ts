@@ -1,42 +1,55 @@
-import { TAd, TPreparedAd, TPreparedAdForCsv } from '../types'
+import { TAd, TPreparedAd, TPreparedAdForCsv } from '../../types'
+import {
+  clearFloorRegex,
+  clearRoomsRegex,
+  clearSquareRegex,
+  getDateRegex,
+  getFloorRegex,
+  getNumbersRegex,
+  getRoomsRegex,
+  getSquareRegex,
+  getTitleRegex
+} from './regex'
 
 export const getPreparedAd = (params: TAd): TPreparedAd => {
   const {
     id: propId,
-    info,
+    infoMini,
+    infoLarge,
     title: propTitle,
     url: propUrl,
     views: propViews,
     price: propPrice,
     city: propCity,
-    metro: propMetro,
-    square: propSquare,
-    rooms: propRooms,
-    floors: propFloors
+    metro: propMetro
   } = params
 
-  const id = Number(propId.replace(/\D/g, ''))
-  const title = propTitle ? String(propTitle.replace(/;/g, '%3B').trim()) : null
+  const id = Number(propId.replace(getNumbersRegex, ''))
+  const title = propTitle
+    ? String(propTitle.replace(getTitleRegex, '%3B').trim())
+    : null
   const url = propUrl ? String(propUrl) : null
-  const dateRegex = info?.match(/[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}/gm)
-  const date = dateRegex ? dateRegex[0] : null
+  const dateR = infoMini?.match(getDateRegex)
+  const date = dateR ? dateR[0] : null
   const views = propViews ? Number(propViews) : null
-  const price = propPrice ? Number(propPrice.replace(/\D/g, '')) : null
+  const price = propPrice
+    ? Number(propPrice.replace(getNumbersRegex, ''))
+    : null
   const cityPrepared = propCity?.split(',')[0]
   const city = cityPrepared ? cityPrepared.trim() : ''
   const metroPrepared = propMetro.find((metro) => metro !== null)
   const metro = metroPrepared ? metroPrepared.trim() : ''
-  const square = propSquare
-    ? Math.ceil(Number(propSquare.replace(/м\n2/g, '')))
+  const squareR = infoLarge?.match(getSquareRegex)?.[0]
+  const square = squareR
+    ? Math.ceil(Number(squareR.replace(clearSquareRegex, '')))
     : null
-  const rooms = propRooms ? Number(propRooms.replace(/-комн\./g, '')) : null
-  const propFloorsPrepared =
-    propFloors && String(propFloors.replace(/этаж/g, '').trim())
-  const propFloorsPreparedSplit = propFloorsPrepared
-    ? propFloorsPrepared.split('/')
-    : null
-  const floor = propFloorsPreparedSplit && Number(propFloorsPreparedSplit[0])
-  const floors = propFloorsPreparedSplit && Number(propFloorsPreparedSplit[1])
+  const roomsR = infoLarge?.match(getRoomsRegex)?.[0]
+  const rooms = roomsR ? Number(roomsR.replace(clearRoomsRegex, '')) : null
+  const floorR = infoLarge?.match(getFloorRegex)?.[0]
+  const floorPrepared = floorR?.replace(clearFloorRegex, '')
+  const floorPreparedSplit = floorPrepared?.split('/')
+  const floor = floorPreparedSplit ? Number(floorPreparedSplit[0]) : null
+  const floors = floorPreparedSplit ? Number(floorPreparedSplit[1]) : null
   const floorTopPrepared = floor ? floor === floors : null
   const floorTop = floorTopPrepared ? '+' : ''
 

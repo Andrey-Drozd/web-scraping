@@ -1,15 +1,13 @@
 export type TAd = {
   id: string
-  info: string | null
+  infoMini: string | null
+  infoLarge: string | null
   title: string | null
   url: string | null
   views: string | null
   price: string | null
   city: string | null
   metro: Array<string | null>
-  square: string | null
-  rooms: string | null
-  floors: string | null
 }
 
 export type TPreparedAd = {

@@ -2,13 +2,16 @@
 export const COUNT_OF_ALL_ADS = 'div.fs-small > strong:nth-child(1)'
 
 // блок с объявлением
-export const AD = 'div.listing-item'
+export const AD = 'div.listing > div.listing-item'
 
 // ID блока с объявлением
-export const AD_ID = '.listing-item .flex-grow-1'
+export const AD_ID = 'div.info-mini > span.flex-grow-1'
 
-// блок с информацией: кол. фотографий, кол. просмотров, дата, ID
-export const AD_INFO = 'div.info-mini'
+// блок с параметрами: кол. фотографий, кол. просмотров, дата, ID
+export const AD_INFO_MINI = 'div.info-mini'
+
+// блок с параметрами: комнат, площадь, этаж и этажность
+export const AD_INFO_LARGE = 'div.info-large'
 
 // стоимость в мес в BYN
 export const AD_PRICE = 'div.row.no-gutters > div > strong'
@@ -18,15 +21,6 @@ export const AD_TITLE = 'div.desc > a'
 
 // количество просмотров
 export const AD_VIEWS = 'div.info-mini > span.views'
-
-// количество комнат
-export const AD_ROOMS = 'div.info-large > span:nth-child(1)'
-
-// общая площадь
-export const AD_SQUARE = 'div.info-large > span:nth-child(2)'
-
-// этаж/этажность
-export const AD_FLOOR = 'div.info-large > span:nth-child(3)'
 
 // город
 export const AD_CITY = 'div.desc > div.location'
