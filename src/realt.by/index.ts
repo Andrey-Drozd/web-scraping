@@ -1,14 +1,21 @@
 import { uniqBy } from 'lodash'
 
 import {
+  COUNT_ALL_ADS,
+  COUNT_ALL_ADS_ON_PAGE,
+  COUNT_PAGES,
+  CREATE_FILE,
+  CREATE_FILE_SUCCESS,
   CSV,
   FIRST_ROW,
-  LOG_FILE,
   LOG_PARSING,
+  NEXT_PAGE,
   PAGE,
+  PARSING_SUCCESS,
   PROPERTIES,
   REALT_BY,
   RESULTS_PATH,
+  SAVE_DATA,
   START_PREPARED_URL,
   START_URL
 } from './constants'
@@ -27,7 +34,7 @@ import {
   METRO_GREEN,
   METRO_RED
 } from './selectors'
-import { dateServices } from './services'
+import { dateServices, logServices } from './services'
 import { TPreparedAd } from './types'
 import {
   checkIsFolderForFiles,
@@ -52,26 +59,23 @@ async function parser(URL: string) {
     const result = countAllAds?.innerText
     return result ? Number(result) : null
   }, countAllAdsNode)
-  console.log(`${LOG_PARSING}countAllAds: `, countAllAds)
+  logServices.send(COUNT_ALL_ADS, countAllAds)
 
   // проверка корректности парсинга количества всех объявлений
   if (!countAllAds) throw Error(`${LOG_PARSING}countAllAds is undefined!`)
 
   // количество объявлений на странице
-  const countAllAdsNodeOnPage = await page.$$(AD_ID)
-  console.log(
-    `${LOG_PARSING}countAllAdsNodeOnPage: `,
-    countAllAdsNodeOnPage.length
-  )
+  const countAllAdsOnPage = await page.$$(AD_ID)
+  logServices.send(COUNT_ALL_ADS_ON_PAGE, countAllAdsOnPage.length)
 
   // количество страниц парсинга
-  const countPages = Math.ceil(countAllAds / countAllAdsNodeOnPage.length)
-  console.log(`${LOG_PARSING}countPages: `, countPages)
+  const countPages = Math.ceil(countAllAds / countAllAdsOnPage.length)
+  logServices.send(COUNT_PAGES, countPages)
 
   const ads: TPreparedAd[] = []
-  let CURRENT_PAGE = PAGE
+  let currentPage = PAGE
 
-  while (countPages > CURRENT_PAGE) {
+  while (countPages > currentPage) {
     const adsNode = await page.$$(AD)
 
     for (const adNode of adsNode) {
@@ -120,22 +124,23 @@ async function parser(URL: string) {
       }
     }
 
-    ++CURRENT_PAGE
-    const NEXT_PAGE = `${START_URL}&page=${CURRENT_PAGE}`
-    console.log(`${LOG_PARSING}nextPage: `, NEXT_PAGE)
-    await page.goto(NEXT_PAGE)
+    ++currentPage
+    const nextPage = `${START_URL}&page=${currentPage}`
+    logServices.send(NEXT_PAGE, nextPage)
+    await page.goto(nextPage)
   }
 
-  console.log(`${LOG_PARSING}Парсинг завершен успешно`)
-  console.log(`${LOG_FILE}Создание файла: ${REALT_BY}_${dateTime}.${CSV}`)
+  logServices.send(PARSING_SUCCESS)
+  logServices.send(CREATE_FILE)
   writeFirstRow({
     path: RESULTS_PATH,
     fileName: `${REALT_BY}_${dateTime}.${CSV}`,
     row: FIRST_ROW
   })
+  logServices.send(CREATE_FILE_SUCCESS)
 
   const uniqueAds = uniqBy(ads, 'id') as TPreparedAd[]
-  console.log(`${LOG_FILE}Сохранение данных`)
+  logServices.send(SAVE_DATA)
   uniqueAds.forEach((ad) => {
     const preparedAd = getPreparedAdForCsv(ad)
     const row = getRowAdForCsv(preparedAd)
@@ -159,7 +164,7 @@ async function parser(URL: string) {
 
 parser(START_PREPARED_URL)
   .then((result) => {
-    console.log(`${LOG_PARSING}countAds: `, result.countAds)
+    logServices.send(COUNT_ALL_ADS, result.countAds)
     // TODO
     // console.log(`${LOG_PARSING}countAdsParsing: `, result.countAdsParsing)
     // console.log(`${LOG_PARSING}PARSING-SUCCESS: `, result.check)

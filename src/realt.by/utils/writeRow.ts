@@ -1,4 +1,4 @@
-import { fsModule } from '../services'
+import { fsServices } from '../services'
 
 export const writeFirstRow = ({
   path,
@@ -9,7 +9,7 @@ export const writeFirstRow = ({
   fileName: string
   row: string
 }) => {
-  fsModule.appendFileSync(`${path}${fileName}`, row)
+  fsServices.appendFileSync(`${path}${fileName}`, row)
 }
 
 export const writeRow = ({
@@ -21,5 +21,5 @@ export const writeRow = ({
   fileName: string
   row: string
 }) => {
-  fsModule.appendFile(`${path}${fileName}`, row)
+  fsServices.appendFile(`${path}${fileName}`, row)
 }
