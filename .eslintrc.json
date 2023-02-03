@@ -56,7 +56,8 @@
       {
         "singleQuote": true,
         "semi": false,
-        "trailingComma": "none"
+        "trailingComma": "none",
+        "endOfLine": "auto"
       }
     ]
   },
