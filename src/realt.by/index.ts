@@ -3,6 +3,7 @@ import { uniqBy } from 'lodash'
 import {
   COUNT_ALL_ADS,
   COUNT_ALL_ADS_ON_PAGE,
+  COUNT_ALL_ADS_PARSING,
   COUNT_PAGES,
   CREATE_FILE,
   CREATE_FILE_SUCCESS,
@@ -11,6 +12,7 @@ import {
   LOG_PARSING,
   NEXT_PAGE,
   PAGE,
+  PARSING_CEHCK,
   PARSING_SUCCESS,
   PROPERTIES,
   REALT_BY,
@@ -155,18 +157,16 @@ async function parser(URL: string) {
   await browser.close()
 
   return {
-    countAds: countAllAds
-    // TODO
-    // countAdsParsing: ads.length,
-    // check: ads.length === countAllAds
+    countAds: countAllAds,
+    countAdsParsing: uniqueAds.length,
+    parsingCheck: countAllAds === uniqueAds.length
   }
 }
 
 parser(START_PREPARED_URL)
-  .then((result) => {
-    logServices.send(COUNT_ALL_ADS, result.countAds)
-    // TODO
-    // console.log(`${LOG_PARSING}countAdsParsing: `, result.countAdsParsing)
-    // console.log(`${LOG_PARSING}PARSING-SUCCESS: `, result.check)
+  .then(({ countAds, countAdsParsing, parsingCheck }) => {
+    logServices.send(COUNT_ALL_ADS, countAds)
+    logServices.send(COUNT_ALL_ADS_PARSING, countAdsParsing)
+    logServices.send(PARSING_CEHCK, parsingCheck)
   })
   .catch((err) => console.log(err))
