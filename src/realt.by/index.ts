@@ -5,19 +5,13 @@ import {
   COUNT_ALL_ADS_ON_PAGE,
   COUNT_ALL_ADS_PARSING,
   COUNT_PAGES,
-  CREATE_FILE,
-  CREATE_FILE_SUCCESS,
-  CSV,
-  FIRST_ROW,
   LOG_PARSING,
   NEXT_PAGE,
   PAGE,
   PARSING_CEHCK,
   PARSING_SUCCESS,
   PROPERTIES,
-  REALT_BY,
   RESULTS_PATH,
-  SAVE_DATA,
   START_PREPARED_URL,
   START_URL
 } from './constants'
@@ -36,22 +30,18 @@ import {
   METRO_GREEN,
   METRO_RED
 } from './selectors'
-import { dateServices, logServices } from './services'
+import { logServices } from './services'
 import { TPreparedAd } from './types'
 import {
   checkIsFolderForFiles,
   curryEvaluate,
   getPreparedAd,
-  getPreparedAdForCsv,
-  getRowAdForCsv,
-  writeFirstRow,
-  writeRow
+  saveDataToFile
 } from './utils'
 
 async function parser(URL: string) {
   const { browser, page } = await init(URL, { headless: true })
   const { INNER_TEXT, HREF, INNER_HTML } = PROPERTIES
-  const dateTime = dateServices.getDateTime()
 
   checkIsFolderForFiles(RESULTS_PATH)
 
@@ -131,28 +121,10 @@ async function parser(URL: string) {
     logServices.send(NEXT_PAGE, nextPage)
     await page.goto(nextPage)
   }
-
   logServices.send(PARSING_SUCCESS)
-  logServices.send(CREATE_FILE)
-  writeFirstRow({
-    path: RESULTS_PATH,
-    fileName: `${REALT_BY}_${dateTime}.${CSV}`,
-    row: FIRST_ROW
-  })
-  logServices.send(CREATE_FILE_SUCCESS)
 
   const uniqueAds = uniqBy(ads, 'id') as TPreparedAd[]
-  logServices.send(SAVE_DATA)
-  uniqueAds.forEach((ad) => {
-    const preparedAd = getPreparedAdForCsv(ad)
-    const row = getRowAdForCsv(preparedAd)
-
-    writeRow({
-      path: RESULTS_PATH,
-      fileName: `${REALT_BY}_${dateTime}.${CSV}`,
-      row
-    })
-  })
+  saveDataToFile(uniqueAds)
 
   await browser.close()
 

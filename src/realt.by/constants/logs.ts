@@ -10,6 +10,7 @@ export const COUNT_PAGES = `${LOG_PARSING}COUNT_PAGES: `
 export const NEXT_PAGE = `${LOG_PARSING}NEXT_PAGE: `
 
 export const SAVE_DATA = `${LOG_FILE}SAVE DATA...`
+export const SAVE_DATA_SUCCESS = `${LOG_FILE}SAVE DATA SUCCESS`
 
 export const PARSING_SUCCESS = `${LOG_PARSING}Parsing completed successfully`
 export const PARSING_CEHCK = `${LOG_PARSING}COUNT_ALL_ADS = COUNT_ALL_ADS_PARSING: `
