@@ -131,7 +131,7 @@ async function parser(URL: string) {
   return {
     countAds: countAllAds,
     countAdsParsing: uniqueAds.length,
-    parsingCheck: countAllAds === uniqueAds.length
+    parsingCheck: String(countAllAds === uniqueAds.length)
   }
 }
 
