@@ -13,7 +13,7 @@ export const SAVE_DATA = `${LOG_FILE}SAVE DATA...`
 export const SAVE_DATA_SUCCESS = `${LOG_FILE}SAVE DATA SUCCESS`
 
 export const PARSING_SUCCESS = `${LOG_PARSING}Parsing completed successfully`
-export const PARSING_CEHCK = `${LOG_PARSING}COUNT_ALL_ADS = COUNT_ALL_ADS_PARSING: `
+export const PARSING_CHECK = `${LOG_PARSING}COUNT_ALL_ADS = COUNT_ALL_ADS_PARSING: `
 
 export const CREATE_FILE = `${LOG_FILE}Creating file...`
 export const CREATE_FILE_SUCCESS = `${LOG_FILE}Create file success`

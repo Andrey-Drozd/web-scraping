@@ -2,13 +2,10 @@ import { uniqBy } from 'lodash'
 
 import {
   COUNT_ALL_ADS,
-  COUNT_ALL_ADS_ON_PAGE,
   COUNT_ALL_ADS_PARSING,
-  COUNT_PAGES,
-  LOG_PARSING,
   NEXT_PAGE,
   PAGE,
-  PARSING_CEHCK,
+  PARSING_CHECK,
   PARSING_SUCCESS,
   PROPERTIES,
   RESULTS_PATH,
@@ -25,7 +22,6 @@ import {
   AD_PRICE,
   AD_TITLE,
   AD_VIEWS,
-  COUNT_OF_ALL_ADS,
   METRO_BLUE,
   METRO_GREEN,
   METRO_RED
@@ -35,6 +31,8 @@ import { TPreparedAd } from './types'
 import {
   checkIsFolderForFiles,
   curryEvaluate,
+  getCountAllAds,
+  getCountPages,
   getPreparedAd,
   saveDataToFile
 } from './utils'
@@ -45,25 +43,8 @@ async function parser(URL: string) {
 
   checkIsFolderForFiles(RESULTS_PATH)
 
-  // количество объявлений по выбранным фильтрам
-  const countAllAdsNode = await page.$(COUNT_OF_ALL_ADS)
-  const countAllAds = await page.evaluate((countAllAds) => {
-    const result = countAllAds?.innerText
-    return result ? Number(result) : null
-  }, countAllAdsNode)
-  logServices.send(COUNT_ALL_ADS, countAllAds)
-
-  // проверка корректности парсинга количества всех объявлений
-  if (!countAllAds) throw Error(`${LOG_PARSING}countAllAds is undefined!`)
-
-  // количество объявлений на странице
-  const countAllAdsOnPage = await page.$$(AD_ID)
-  logServices.send(COUNT_ALL_ADS_ON_PAGE, countAllAdsOnPage.length)
-
-  // количество страниц парсинга
-  const countPages = Math.ceil(countAllAds / countAllAdsOnPage.length)
-  logServices.send(COUNT_PAGES, countPages)
-
+  const countAllAds = await getCountAllAds(page)
+  const countPages = await getCountPages(page, countAllAds)
   const ads: TPreparedAd[] = []
   let currentPage = PAGE
 
@@ -139,6 +120,6 @@ parser(START_PREPARED_URL)
   .then(({ countAds, countAdsParsing, parsingCheck }) => {
     logServices.send(COUNT_ALL_ADS, countAds)
     logServices.send(COUNT_ALL_ADS_PARSING, countAdsParsing)
-    logServices.send(PARSING_CEHCK, parsingCheck)
+    logServices.send(PARSING_CHECK, parsingCheck)
   })
   .catch((err) => console.log(err))
